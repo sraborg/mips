@@ -6,6 +6,7 @@ import java.util.ListIterator;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import javax.swing.SwingUtilities;
 
 public class MipsSim {
 	Gui gui;
@@ -44,45 +45,44 @@ public class MipsSim {
 	
 	private Vector<MipsInstruction> instructions = new Vector<MipsInstruction>(25); // Holds Instructions
 	private HashMap<String, Integer> data = new HashMap<String, Integer>(); // Holds Data
-	private ListIterator programCounter;
+	private ListIterator<MipsInstruction> programCounter;
 
 
 	HashMap<String, String> opcodes = new HashMap<String, String>(); // Dictionary holds mapping to opcodes
-
-
 	
 
 	// Program Entry Point
 	public static void main(String[] args) {
 
-		// Check how many arguments were passed in
-		/*if(args.length == 0)
-		{
-		    System.out.println("Error no file specified. \nProper Usage is: MipsSim <file>");
-		    System.exit(0);
-		}*/
-
-		// Setup Components
-		MipsSim sim = new MipsSim(args[0]);
-
-
-		
 
 		System.out.println("Stack Offset: " + stackOffset);
 		System.out.println("Text Offset: " + textOffset);
 		System.out.println("Data Offset: " + dataOffset);
+		// Setup Components
+		MipsSim sim = new MipsSim(args[0]);
+
+		// Set GUI to run in separate thread (EDT)
+		SwingUtilities.invokeLater(new Runnable(){
+
+			public void run() {
+				sim.gui = new Gui(sim);
+				sim.programCounter = sim.instructions.listIterator();
+				sim.loadFileInstructions(args[0]);
+			}
+		});
+
+
+
+		
+
+		
 		
 	}
 
 
 
 
-	public MipsSim(String file) {
-		gui = new Gui();
-		loadFileInstructions(file);
-		programCounter = instructions.listIterator();
-
-	}
+	public MipsSim(String file) { }
 
 	public static String registerAlias(Integer register) {
 		switch(register) {
@@ -149,9 +149,40 @@ public class MipsSim {
 	*	Maps a MIPs Instruction to its corresponding simulated Instruction
 	*
 	****************************************************************************/
-	private void functionCall(String instruction) {
+	public void processInstruction() {
+		System.out.println("Processing Instruction ");
+		/*
+		if(programCounter.hasNext()) {
+			System.out.println("hasNext = True");
+			MipsInstruction currentInstruction = programCounter.next();
+
+			System.out.println("currentInstruction: " +currentInstruction);
+
+			if(currentInstruction instanceof RTypeInstruction) {
+				ITypeInstruction iTypeInstruction = (ITypeInstruction) currentInstruction;
+
+				switch(currentInstruction.getOpcode()) {
+					case "101001":
+						register[iTypeInstruction.getrt()] = register[iTypeInstruction.getrs()] + register[iTypeInstruction.getImmediate()];
+						break;
+				}
+			}
+
+			System.out.println("Processing R-Type");
+			if(currentInstruction instanceof RTypeInstruction) {
+				RTypeInstruction rTypeInstruction = (RTypeInstruction) currentInstruction;
+
+				switch(currentInstruction.getOpcode()) {
+					case "100000":
+						register[rTypeInstruction.getrd()] = register[rTypeInstruction.getrs()] + register[rTypeInstruction.getrt()];
+						break;
+				}
+			}
 
 
+
+		}
+		*/
 
 
 	}
@@ -193,8 +224,8 @@ public class MipsSim {
 				this.data.put(key, value);
 				temp = br.readLine();
 			}
-
-			//gui.setSelectedInterval(programCounter.nextIndex());
+			System.out.println("Index " + programCounter.nextIndex());
+			gui.setCurrentInstruction(programCounter.nextIndex());
 
     	} catch (Exception error) {
 			error.printStackTrace();
@@ -205,6 +236,7 @@ public class MipsSim {
 
 	/*************************************************************
 	* 
+	*	Debug Method
 	*	Prints each Instruction in the Instructions List
 	*
 	**************************************************************/

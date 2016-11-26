@@ -40,5 +40,19 @@ public class ITypeInstruction extends MipsInstruction {
 		}
 	}
 
+	/**********************************************
+	* 
+	*	Getter Methods
+	*
+	***********************************************/
+	public Integer getrs() {
+		return this.rs;
+	}
+	public Integer getrt() {
+		return this.rt;
+	}
+		public Integer getImmediate() {
+		return this.rt;
+	}
 
 }

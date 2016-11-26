@@ -43,8 +43,20 @@ public class RTypeInstruction extends MipsInstruction {
 		}
 	}
 
-
-
+	/**********************************************
+	* 
+	*	Getter Methods
+	*
+	***********************************************/
+	public Integer getrs() {
+		return this.rs;
+	}
+	public Integer getrt() {
+		return this.rt;
+	}
+	public Integer getrd() {
+		return this.rd;
+	}
 
 
 }

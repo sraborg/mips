@@ -64,6 +64,12 @@ public abstract class MipsInstruction {
 	public String getInstruction() {
 		return this.instruction;
 	}
+	public String getOpcode() {
+		return this.opcode;
+	}
+	public String getInstructionType() {
+		return this.instructionType;
+	}
 	/**********************************************
 	* 
 	*	Overriden Methods

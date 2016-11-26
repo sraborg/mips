@@ -3,15 +3,19 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.ListSelectionModel;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 public class Gui {
+	MipsSim sim;
 	JFrame window = new JFrame();
 	JMenuBar menuBar = new JMenuBar();
 	JMenu fileMenu = new JMenu("File");
@@ -21,9 +25,13 @@ public class Gui {
 	DefaultTableModel registersTableModel;
 	JTable instructionTable;
 	JTable registersTable;
-	ListSelectionModel instructionListSelectionModel;
 
-	public Gui() {
+	JButton processInstructionBtn = new JButton("Process Instruction");
+
+	JPanel bottomPanel = new JPanel(new GridLayout(3,1));
+
+	public Gui(MipsSim sim) {
+		this.sim = sim;
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle("Mips Simulator");
 		window.setSize(1280,720);
@@ -40,6 +48,7 @@ public class Gui {
 			}
 		};
 		instructionTable = new JTable(instructionsTableModel);
+		//instructionTable.setRowSelectionAllowed(false);
 		instructionTable.setFocusable(false);
 
 		// Configure Registers Table
@@ -53,12 +62,21 @@ public class Gui {
 		registersTable = new JTable(registersTableModel);
 		//registersTable.setRowSelectionAllowed(Boolean.FALSE);
 		registersTable.getColumnModel().getColumn(0).setPreferredWidth(10);
-		registersTable.setCellSelectionEnabled(Boolean.FALSE);
+		//registersTable.setCellSelectionEnabled(Boolean.FALSE);
 		registersTable.setFocusable(false);
-		instructionListSelectionModel = registersTable.getSelectionModel();
+
+		// Configure Process Button
+		processInstructionBtn.addActionListener(new ActionListener() { 
+			public void actionPerformed(ActionEvent e) { 
+				sim.processInstruction();
+			} 
+		});
+
+		bottomPanel.add(processInstructionBtn);
 
 		window.add(new JScrollPane(registersTable), BorderLayout.WEST);
 		window.add(new JScrollPane(instructionTable));
+		window.add(bottomPanel, BorderLayout.SOUTH);
 
 		window.setJMenuBar(menuBar);
 
@@ -72,10 +90,9 @@ public class Gui {
 
 	}
 
-	public void setSelectedInterval(int index) {
-		//instructionTable.setRowSelectionInterval(3,3);
+	public void setCurrentInstruction(int index) {
+		instructionTable.setRowSelectionInterval(index,index);
 
 	}
-
 
 }
