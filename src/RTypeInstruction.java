@@ -14,6 +14,7 @@ public class RTypeInstruction extends MipsInstruction {
 	public RTypeInstruction(String hexAddress, String hexInstruc, String binaryInstruction, String opcode) {
 		this.instructionType = "R-Type";
 		this.hexAddress = hexAddress;
+		this.binaryAddress = Long.toString(Long.decode(hexAddress.trim()));
 		this.hexInstruction = hexInstruc;
 		this.binaryInstruction = binaryInstruction;
 

@@ -44,8 +44,33 @@ public abstract class MipsInstruction {
 
 	}
 
+	/**********************************************
+	* 
+	*	Getter Methods
+	*
+	***********************************************/
+	public String getBinaryAddress() {
+		return this.binaryAddress;
+	}
+	public String getHexAddress() {
+		return this.hexAddress;
+	}
+	public String getHexInstruction() {
+		return this.hexInstruction;
+	}
+	public String getBinaryInstruction() {
+		return this.binaryInstruction;
+	}
+	public String getInstruction() {
+		return this.instruction;
+	}
+	/**********************************************
+	* 
+	*	Overriden Methods
+	*
+	***********************************************/
 	public String toString() {
-		return instruction;
+		return this.instruction;
 	}
 
 }

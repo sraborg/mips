@@ -9,6 +9,7 @@ public class ITypeInstruction extends MipsInstruction {
 	public ITypeInstruction(String hexAddress, String hexInstruc, String binaryInstruction, String opcode) {
 		this.instructionType = "I-Type";
 		this.hexAddress = hexAddress;
+		this.binaryAddress = Long.toString(Long.decode(hexAddress.trim()));
 		this.hexInstruction = hexInstruc;
 		this.binaryInstruction = binaryInstruction;
 

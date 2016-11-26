@@ -1,11 +1,14 @@
 package mips_sim;
 
-import java.util.HashMap;
-import java.util.Vector;
 import java.util.Stack;
+import java.util.Vector;
+import java.util.ListIterator;
+import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class MipsSim {
-	
+	Gui gui;
 	/**********************************************
 	* 
 	*	Register Constants
@@ -39,6 +42,9 @@ public class MipsSim {
 	private Integer[] register = new Integer[32];
 	private Stack stack = new Stack();
 	
+	private Vector<MipsInstruction> instructions = new Vector<MipsInstruction>(25); // Holds Instructions
+	private HashMap<String, Integer> data = new HashMap<String, Integer>(); // Holds Data
+	private ListIterator programCounter;
 
 
 	HashMap<String, String> opcodes = new HashMap<String, String>(); // Dictionary holds mapping to opcodes
@@ -57,13 +63,10 @@ public class MipsSim {
 		}*/
 
 		// Setup Components
-		MipsSim sim = new MipsSim();
-		//Gui gui = new Gui();
-		InstructionLoader instruction = new InstructionLoader(args[0]);
-		
-		// Process Instructions
+		MipsSim sim = new MipsSim(args[0]);
 
-		instruction.printInstructions();
+
+		
 
 		System.out.println("Stack Offset: " + stackOffset);
 		System.out.println("Text Offset: " + textOffset);
@@ -74,8 +77,10 @@ public class MipsSim {
 
 
 
-	public MipsSim() {
-		
+	public MipsSim(String file) {
+		gui = new Gui();
+		loadFileInstructions(file);
+		programCounter = instructions.listIterator();
 
 	}
 
@@ -153,5 +158,61 @@ public class MipsSim {
 
 	// Simulated Functions
 
+
+	private void loadFileInstructions(String file) {
+    	String temp;
+    	String[] tempArray;
+    	String key;
+    	Integer value;
+    	int i;
+	
+    	try {
+
+    		// Access File
+    		BufferedReader br = new BufferedReader(new FileReader(file));
+
+    		// Read Instructions
+    		i = 0;
+    		temp = br.readLine();
+    		while (temp != null 
+				&& temp.contains("DATA SEGMENT") == Boolean.FALSE) {
+
+				this.instructions.add(MipsInstruction.getInstruction(Integer.toString(i),temp)); // Load Line into Instructions
+				gui.addInstruction(this.instructions.lastElement());
+				temp = br.readLine();
+				i += 4;
+			} 
+
+
+			// Read Data Section
+			temp = br.readLine();
+			while (temp != null){
+				tempArray = temp.split(" ");
+				key = tempArray[0];
+				value = Integer.decode(tempArray[1]);
+				this.data.put(key, value);
+				temp = br.readLine();
+			}
+
+			//gui.setSelectedInterval(programCounter.nextIndex());
+
+    	} catch (Exception error) {
+			error.printStackTrace();
+			System.exit(0);
+		}
+
+	}
+
+	/*************************************************************
+	* 
+	*	Prints each Instruction in the Instructions List
+	*
+	**************************************************************/
+	public void printInstructions() {
+		for (MipsInstruction instruction : instructions)
+			System.out.println(instruction);
+	}
 }
+
+
 
