@@ -24,7 +24,7 @@ public class Gui {
 	DefaultTableModel instructionsTableModel;
 	DefaultTableModel registersTableModel;
 	JTable instructionTable;
-	JTable registersTable;
+	public JTable registersTable;
 
 	JButton processInstructionBtn = new JButton("Process Instruction");
 
@@ -42,7 +42,7 @@ public class Gui {
 
 
 		// Configure Instructions Table
-		instructionsTableModel = new DefaultTableModel(null, new String[]{"Address (hex)", "Address (binary)", "Instructions (hex)", "Instructions (binary)", "Instructions"}) {
+		instructionsTableModel = new DefaultTableModel(null, new String[]{"Address (hex)", "Instructions (hex)", "Instructions (binary)", "Instructions"}) {
 			public boolean isCellEditable(int rowIndex, int mColIndex) {
 		    	return false;
 			}
@@ -58,7 +58,7 @@ public class Gui {
 			}
 		};
 		for(int i = 0; i < 32; i++)
-			registersTableModel.addRow(new String[] {"$"+ i, "00000000","0"});
+			registersTableModel.addRow(new String[] {"$"+ i, "00000000000000000000000000000000","0"});
 		registersTable = new JTable(registersTableModel);
 		//registersTable.setRowSelectionAllowed(Boolean.FALSE);
 		registersTable.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -86,7 +86,7 @@ public class Gui {
 	}
 
 	public void addInstruction(MipsInstruction instruction) {
-		instructionsTableModel.addRow(new String[] {instruction.getHexAddress(), instruction.getBinaryAddress(), instruction.getHexInstruction(), instruction.getBinaryInstruction(), instruction.getInstruction()});
+		instructionsTableModel.addRow(new String[] {instruction.getHexAddress(), instruction.getHexInstruction(), instruction.getBinaryInstruction(), instruction.getInstruction()});
 
 	}
 

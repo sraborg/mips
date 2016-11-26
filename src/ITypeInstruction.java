@@ -4,19 +4,19 @@ public class ITypeInstruction extends MipsInstruction {
 	
 	Integer rs;
 	Integer rt;
-	Integer immediate;
+	Long immediate;
 
 	public ITypeInstruction(String hexAddress, String hexInstruc, String binaryInstruction, String opcode) {
 		this.instructionType = "I-Type";
-		this.hexAddress = hexAddress;
-		this.binaryAddress = Long.toString(Long.decode(hexAddress.trim()));
+		this.hexAddress = "0x" + String.format("%8s",Long.toBinaryString(Long.decode(hexAddress))).replace(" ", "0");
+		this.binaryAddress = String.format("%32s",Integer.decode(hexAddress.trim())).replace(" ", "0");
 		this.hexInstruction = hexInstruc;
 		this.binaryInstruction = binaryInstruction;
 
 		this.opcode = opcode;
-		this.rs = Integer.parseInt(binaryInstruction.substring(7,11), 2);
+		this.rs = Integer.parseInt(binaryInstruction.substring(6,11), 2);
 		this.rt = Integer.parseInt(binaryInstruction.substring(11,16),2);
-		this.immediate = Integer.parseInt(binaryInstruction.substring(16,32),2);
+		this.immediate = Long.parseLong(binaryInstruction.substring(16,32),2);
 
 		switch(opcode) {
 
@@ -51,8 +51,8 @@ public class ITypeInstruction extends MipsInstruction {
 	public Integer getrt() {
 		return this.rt;
 	}
-		public Integer getImmediate() {
-		return this.rt;
+	public Long getImmediate() {
+		return this.immediate;
 	}
 
 }

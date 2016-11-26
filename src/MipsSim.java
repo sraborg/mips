@@ -40,7 +40,7 @@ public class MipsSim {
 	public static final Integer textOffset = Integer.decode("0x00400000");
 	public static final Integer dataOffset = Integer.decode("0x10010000");
 
-	private Integer[] register = new Integer[32];
+	private Long[] register;
 	private Stack stack = new Stack();
 	
 	private Vector<MipsInstruction> instructions = new Vector<MipsInstruction>(25); // Holds Instructions
@@ -48,7 +48,7 @@ public class MipsSim {
 	private ListIterator<MipsInstruction> programCounter;
 
 
-	HashMap<String, String> opcodes = new HashMap<String, String>(); // Dictionary holds mapping to opcodes
+	//HashMap<String, String> opcodes = new HashMap<String, String>(); // Dictionary holds mapping to opcodes
 	
 
 	// Program Entry Point
@@ -63,27 +63,33 @@ public class MipsSim {
 
 		// Set GUI to run in separate thread (EDT)
 		SwingUtilities.invokeLater(new Runnable(){
-
 			public void run() {
 				sim.gui = new Gui(sim);
-				sim.programCounter = sim.instructions.listIterator();
 				sim.loadFileInstructions(args[0]);
 			}
 		});
 
-
-
-		
-
-		
-		
 	}
 
 
 
 
-	public MipsSim(String file) { }
+	public MipsSim(String file) { 
+		// Declare and Manually Initialize register array
+		register = new Long[32];
+		for (int i=0; i < register.length; i++) {
+			register[i] = 0L;
+		}
 
+	}
+
+	/***************************************************************************
+	* 
+	*	Simple Helper Function
+	*	@param Takes register number
+	*	@return Returns the common name for the register
+	*
+	****************************************************************************/
 	public static String registerAlias(Integer register) {
 		switch(register) {
 			case 2:
@@ -143,32 +149,41 @@ public class MipsSim {
 				return "$" + register;
 		}
 	}
+
+
 	/***************************************************************************
 	* 
 	*	Intruction Controller
 	*	Maps a MIPs Instruction to its corresponding simulated Instruction
 	*
 	****************************************************************************/
-	public void processInstruction() {
-		System.out.println("Processing Instruction ");
-		/*
-		if(programCounter.hasNext()) {
-			System.out.println("hasNext = True");
-			MipsInstruction currentInstruction = programCounter.next();
+	public synchronized void processInstruction() {
+		
+		
+		if(this.programCounter.hasNext()) {
+			MipsInstruction currentInstruction = this.programCounter.next();
 
-			System.out.println("currentInstruction: " +currentInstruction);
-
-			if(currentInstruction instanceof RTypeInstruction) {
+			if(currentInstruction instanceof ITypeInstruction) {
 				ITypeInstruction iTypeInstruction = (ITypeInstruction) currentInstruction;
+				Integer rs = iTypeInstruction.getrs();
+				Integer rt = iTypeInstruction.getrt();
+				Long immediate = iTypeInstruction.getImmediate();
 
 				switch(currentInstruction.getOpcode()) {
-					case "101001":
-						register[iTypeInstruction.getrt()] = register[iTypeInstruction.getrs()] + register[iTypeInstruction.getImmediate()];
+
+					// addiu
+					case "001001":
+						register[rt] = register[rs] + immediate;
+						System.out.println(this.register[rt] + ", " + rs +", " + immediate);
+						this.gui.registersTableModel.setValueAt(String.format("%32s",Long.toBinaryString(Long.decode(Integer.toBinaryString(rt)))).replace(" ", "0"), rt, 1); // Set Binary Value
+						this.gui.registersTableModel.setValueAt(register[rt], rt, 2); // Set Decimal Value
+						this.gui.registersTable.revalidate();
+						this.gui.registersTable.repaint();
 						break;
 				}
 			}
 
-			System.out.println("Processing R-Type");
+
 			if(currentInstruction instanceof RTypeInstruction) {
 				RTypeInstruction rTypeInstruction = (RTypeInstruction) currentInstruction;
 
@@ -178,11 +193,12 @@ public class MipsSim {
 						break;
 				}
 			}
+			this.gui.setCurrentInstruction(this.programCounter.previousIndex());
 
-
-
+		} else {
+			System.out.println("No More Instructions");
 		}
-		*/
+		
 
 
 	}
@@ -224,7 +240,8 @@ public class MipsSim {
 				this.data.put(key, value);
 				temp = br.readLine();
 			}
-			System.out.println("Index " + programCounter.nextIndex());
+
+			this.programCounter = this.instructions.listIterator();
 			gui.setCurrentInstruction(programCounter.nextIndex());
 
     	} catch (Exception error) {
