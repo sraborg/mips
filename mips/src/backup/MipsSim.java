@@ -11,19 +11,24 @@ import javax.swing.SwingUtilities;
 public class MipsSim {
 	Gui gui;
 	/**********************************************
-	* 
+	*
 	*	Register Constants
 	*
 	***********************************************/
-	
+	/*
+		Constants created for the purpose of making identifying registers easier in relation to mips.
+		Instead of loking up documentation to see what register, for example, 3 is, the actual register
+		name can be used instead of the number.
+	*/
+
 	public static final int $zero = 0; // Hard-wired 0
 	public static final int $at = 1; // Pseudo-Instructions
-	
+
 	public static final int $v0 = 2, $v1 = 3;	// Function Return Values
 	public static final int $a0 = 4, $a1 = 5, $a2 = 6, $a3 = 7; // Function Arguments
 
 	// Temp Registers (Not Preserved by functions)
-	public static final int $t0 = 8, $t1 = 9, $t2 = 10, $t3 = 11, $t4 = 12, $t5 = 13, $t6 = 14, $t7 = 15;	
+	public static final int $t0 = 8, $t1 = 9, $t2 = 10, $t3 = 11, $t4 = 12, $t5 = 13, $t6 = 14, $t7 = 15;
 
 	// Saved Registers (Preserved by functions)
 	public static final int $s0 = 16, $s1 = 17, $s2 = 18, $s3 = 19, $s4 = 20, $s5 = 21, $s6 = 22, $s7 = 23, $s8 = 24, $s9 = 25;
@@ -36,20 +41,44 @@ public class MipsSim {
 
 	public static final int MAX_STACK_SIZE = 100;
 
+/*
+	Creates a hex value for the simulated memory starting addresses. Displayed with instruction/data
+	associated with it in order to give the illusion of using actual registers and memory
+*/
+
 	public static final Integer stackOffset = Integer.decode("0x7fffefff");
 	public static final Integer textOffset = Integer.decode("0x00400000");
 	public static final Integer dataOffset = Integer.decode("0x10010000");
 
+// arrays for the simulated registers and the dynamic stack
 	private Long[] register;
 	private Stack stack = new Stack();
-	
+
+/*
+	Vector that holds MipsInstruction objects, which are actually instantiated as either a derived class
+	of MipsInstruction with the added properties and functions of ether RTypeInstruction or ITypeInstruction.
+	Those two objects inherit MipsInstruction. MipsInstruction can't be instantiated, but is used as a factory
+	to create specific instruction types.
+*/
 	private Vector<MipsInstruction> instructions = new Vector<MipsInstruction>(25); // Holds Instructions
+
+/*
+	Array where the hex 'DATA SEGMENT' from the given code text file is stored. Uses dictionary format, key=value,
+	where key is the register value, and value is the raw data in hex form
+*/
+
 	private HashMap<String, Integer> data = new HashMap<String, Integer>(); // Holds Data
+
+/*
+	Used as an iterator of the 'instructions' vector, to keep track of which instruction is currently being
+	processed.
+*/
+
 	private ListIterator<MipsInstruction> programCounter;
 
 
 	//HashMap<String, String> opcodes = new HashMap<String, String>(); // Dictionary holds mapping to opcodes
-	
+
 
 	// Program Entry Point
 	public static void main(String[] args) {
@@ -74,7 +103,7 @@ public class MipsSim {
 
 
 
-	public MipsSim(String file) { 
+	public MipsSim(String file) {
 		// Declare and Manually Initialize register array
 		register = new Long[32];
 		for (int i=0; i < register.length; i++) {
@@ -84,7 +113,7 @@ public class MipsSim {
 	}
 
 	/***************************************************************************
-	* 
+	*
 	*	Simple Helper Function
 	*	@param Takes register number
 	*	@return Returns the common name for the register
@@ -152,14 +181,14 @@ public class MipsSim {
 
 
 	/***************************************************************************
-	* 
+	*
 	*	Intruction Controller
 	*	Maps a MIPs Instruction to its corresponding simulated Instruction
 	*
 	****************************************************************************/
 	public synchronized void processInstruction() {
-		
-		
+
+
 		if(this.programCounter.hasNext()) {
 			MipsInstruction currentInstruction = this.programCounter.next();
 
@@ -198,7 +227,7 @@ public class MipsSim {
 		} else {
 			System.out.println("No More Instructions");
 		}
-		
+
 
 
 	}
@@ -212,7 +241,7 @@ public class MipsSim {
     	String key;
     	Integer value;
     	int i;
-	
+
     	try {
 
     		// Access File
@@ -221,14 +250,14 @@ public class MipsSim {
     		// Read Instructions
     		i = 0;
     		temp = br.readLine();
-    		while (temp != null 
+    		while (temp != null
 				&& temp.contains("DATA SEGMENT") == Boolean.FALSE) {
 
 				this.instructions.add(MipsInstruction.getInstruction(Integer.toString(i),temp)); // Load Line into Instructions
 				gui.addInstruction(this.instructions.lastElement());
 				temp = br.readLine();
 				i += 4;
-			} 
+			}
 
 
 			// Read Data Section
@@ -252,7 +281,7 @@ public class MipsSim {
 	}
 
 	/*************************************************************
-	* 
+	*
 	*	Debug Method
 	*	Prints each Instruction in the Instructions List
 	*
@@ -262,6 +291,3 @@ public class MipsSim {
 			System.out.println(instruction);
 	}
 }
-
-
-

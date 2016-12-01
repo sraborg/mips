@@ -12,7 +12,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
+import java.io.*;
+import javax.swing.JFileChooser;
 
 public class Gui {
 	MipsSim sim;
@@ -26,6 +27,8 @@ public class Gui {
 	JTable instructionTable;
 	public JTable registersTable;
 
+	final JFileChooser fc = new JFileChooser();
+
 	JButton processInstructionBtn = new JButton("Process Instruction");
 
 	JPanel bottomPanel = new JPanel(new GridLayout(3,1));
@@ -37,7 +40,16 @@ public class Gui {
 		window.setSize(1280,720);
 		window.setLocationRelativeTo(null);
 
-		fileMenu.add(openMenuItem);
+		fileMenu.add(openMenuItem).addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int result = fc.showOpenDialog(window);
+				if (result == JFileChooser.APPROVE_OPTION){
+					File selectedFile = fc.getSelectedFile();
+					sim.loadFileInstructions(selectedFile.getAbsolutePath());
+				}
+			};
+		});
+
 		menuBar.add(fileMenu);
 
 
@@ -58,7 +70,7 @@ public class Gui {
 			}
 		};
 		for(int i = 0; i < 32; i++)
-			registersTableModel.addRow(new String[] {"$"+ i, "00000000000000000000000000000000","0"});
+			registersTableModel.addRow(new String[] {sim.registerAlias(i), "00000000000000000000000000000000","0"});
 		registersTable = new JTable(registersTableModel);
 		//registersTable.setRowSelectionAllowed(Boolean.FALSE);
 		registersTable.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -66,10 +78,10 @@ public class Gui {
 		registersTable.setFocusable(false);
 
 		// Configure Process Button
-		processInstructionBtn.addActionListener(new ActionListener() { 
-			public void actionPerformed(ActionEvent e) { 
+		processInstructionBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				sim.processInstruction();
-			} 
+			}
 		});
 
 		bottomPanel.add(processInstructionBtn);
